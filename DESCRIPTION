@@ -1,0 +1,12 @@
+Package: FDAlibrary
+Title: R package for the cytometry data analysis created for the FDA dataset
+Version: 0.0.0.9000
+Authors@R: person("Gabi", "Fragiadakis", email = "gabif@stanford.edu", role = c("aut", "cre"))
+Description: Useful tools for extracting the data using the API R toolkit, and performing subsequent statistical analyses.  
+Depends: R (>= 3.1.1)
+License: What license is it under?
+LazyData: true
+Imports:
+	RCurl,
+	jsonlite,
+	png
