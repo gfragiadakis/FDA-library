@@ -1,108 +1,149 @@
 #' Authenticate acess
-#' 
+#'
 #' This function establishes the connection to your account on the remote server
+#' It returns an object containing the server URL and your connection info: opts
 #' @param username The username for the account
 #' @param password The password for the account
-
-authenticate = function(username, password) {
-  userinfo = toJSON(list(username=username, password=password), auto_unbox = TRUE)
-  header = c(Accept="application/json; charset=UTF-8","Content-Type"="application/json")
-  signinURL = paste(baseURL, "signin", sep = "/")
-  result = postForm(signinURL,.opts=list(httpheader=header, postfields=userinfo))
-  jwt <<- fromJSON(result)$accessToken
-  authToken = paste("Authorization: Bearer", jwt)
-  opts <<- list(httpheader = c(authToken))
+#' @param baseURL The URL for the server
+#' @import jsonlite
+#' @import RCurl
+#' @export
+authenticate <- function(username, password, baseURL) {
+  userinfo <- toJSON(list(username=username, password=password), auto_unbox = TRUE)
+  header <- c(Accept="application/json; charset=UTF-8","Content-Type"="application/json")
+  signinURL <- paste(baseURL, "signin", sep = "/")
+  result <- postForm(signinURL,.opts=list(httpheader=header, postfields=userinfo))
+  jwt <- fromJSON(result)$accessToken
+  authToken <- paste("Authorization: Bearer", jwt)
+  opts <- list(httpheader = c(authToken))
+  return(list(baseURL = baseURL, opts = opts, jwt = jwt))
 }
 
 #' Retrieve all accessible experiments
-#' 
-#' This function retrieves an object with the information about all acessible experiments 
+#'
+#' This function retrieves an object with the information about all acessible experiments
+#' @param baseURL The URL for the server
+#' @param access_key An object containing server URL and authentication info: see "authenticate"
+#' @import jsonlite
+#' @import RCurl
+#' @export
 
-getExperiments = function() {
-  url = paste(baseURL, "experiments", sep = "/")
+get_experiments <- function(access_key) {
+  opts <- access_key$opts
+  baseURL <- access_key$baseURL
+  url <- paste(baseURL, "experiments", sep = "/")
   return(fromJSON(getURL(url, .opts = opts)))
 }
 
 #' Retrieve one experiment
-#' 
+#'
 #' This function retrieves an object with the information from one experiment specified by the experiment ID
-#' @param experimentId the experiment ID as a string
+#' @param experimentID the experiment ID as a string
+#' @param access_key An object containing server URL and authentication info: see "authenticate"
+#' @export
 
-getExperiment = function(experimentId) {
-  url = paste(baseURL, "experiments", experimentId, sep = "/")
+get_experiment <- function(experimentID, access_key) {
+  opts <- access_key$opts
+  baseURL <- access_key$baseURL
+  url <- paste(baseURL, "experiments", experimentID, sep = "/")
   return(fromJSON(getURL(url, .opts = opts)))
 }
 
 #' Get all FCS files for an experiment
-#' 
+#'
 #' Returns an object containing all FCS files from the experiments based on the experiment ID
-#' @param experimentId the experiment ID as a string
+#' @param experimentID the experiment ID as a string
+#' @param access_key An object containing server URL and authentication info: see "authenticate"
+#' @export
 
-getFcsFilesForExperiment = function(experimentId) {
-  url = paste(baseURL, "experiments", experimentId, "fcsfiles", sep = "/")
+get_FCS_files <- function(experimentID, access_key) {
+  opts <- access_key$opts
+  baseURL <- access_key$baseURL
+  url <- paste(baseURL, "experiments", experimentID, "fcsfiles", sep = "/")
   return(fromJSON(getURL(url, .opts = opts)))
 }
 
 #' Download an FCS file
-#' @param experimentId the experiment ID as a string
-#' @param fcsFileId the FCS file ID as a string
-#' @param localFilePath path where to download the data
+#' @param experimentID the experiment ID as a string
+#' @param FCS_fileID the FCS file ID as a string
+#' @param local_file_path path where to download the data
+#' @param access_key An object containing server URL and authentication info: see "authenticate"
+#' @export
 
-downloadFcsFile=function(experimentId, fcsFileId, localFilePath) {
-  f = CFILE(localFilePath, mode="wb")
-  url = paste(paste(baseURL, "experiments", experimentId, "fcsfiles", fcsFileId, sep = "/"), ".fcs", sep="")
-  a = curlPerform(url = url, .opts = opts, writedata = f@ref, noprogress=FALSE)
+download_fcs_file <- function(experimentID, FCS_fileID, local_file_path, access_key) {
+  opts <- access_key$opts
+  baseURL <- access_key$baseURL
+  f <- CFILE(local_file_path, mode="wb")
+  url <- paste(paste(baseURL, "experiments", experimentID, "fcsfiles", FCS_fileID, sep = "/"), ".fcs", sep="")
+  a <- curlPerform(url = url, .opts = opts, writedata = f@ref, noprogress=FALSE)
   close(f)
   return(a)
 }
 
 #' Get all gates for an experiment
-#' @param experimentId the experiment ID as a string
+#' @param experimentID the experiment ID as a string
+#' @param access_key An object containing server URL and authentication info: see "authenticate"
+#' @export
 
-getGatesForExperiment = function(experimentId) {
-  url = paste(baseURL, "experiments", experimentId, "gates", sep = "/")
+get_gates <- function(experimentID, access_key) {
+  opts <- access_key$opts
+  baseURL <- access_key$baseURL
+  url <- paste(baseURL, "experiments", experimentID, "gates", sep = "/")
   return(fromJSON(getURL(url, .opts = opts)))
 }
 
 #' Get all populations for an experiment
-#' @param experimentId the experiment ID as a string
+#' @param experimentID the experiment ID as a string
+#' @param access_key An object containing server URL and authentication info: see "authenticate"
+#' @export
 
-getPopulationsForExperiment = function(experimentId) {
-  url = paste(baseURL, "experiments", experimentId, "populations", sep = "/")
+get_populations <- function(experimentID, acess_key) {
+  opts <- access_key$opts
+  baseURL <- access_key$baseURL
+  url <- paste(baseURL, "experiments", experimentID, "populations", sep = "/")
   return(fromJSON(getURL(url, .opts = opts)))
 }
 
 #' Get all scale sets for an experiment
-#' @param experimentId the experiment ID as a string
-#' 
-getScaleSetsForExperiment = function(experimentId) {
-  url = paste(baseURL, "experiments", experimentId, "scalesets", sep = "/")
+#' @param experimentID the experiment ID as a string
+#' @param access_key An object containing server URL and authentication info: see "authenticate"
+#' @export
+
+get_scale_sets <- function(experimentID, access_key) {
+  opts <- access_key$opts
+  baseURL <- access_key$baseURL
+  url <- paste(baseURL, "experiments", experimentID, "scalesets", sep = "/")
   return(fromJSON(getURL(url, .opts = opts)))
 }
 
 #' Plot the data
-#' 
+#'
 #' Creates a plot of specified channels and populations
-#' @param experimentId the experiment ID as a string
-#' @param fcsFileId the FCS file ID as a string
-#' @param xChannelName The channel for the x axis named by metal
-#' @param yChannelName The channel for the y axis named by metal
-#' @param populationId the population ID as a string
+#' @param experimentID the experiment ID as a string
+#' @param FCS_fileID the FCS file ID as a string
+#' @param access_key An object containing server URL and authentication info: see "authenticate"
+#' @param x_channel_name The channel for the x axis named by metal
+#' @param y_channel_name The channel for the y axis named by metal
+#' @param populationID the population ID as a string
+#' @export
 
-getPlot = function(experimentId, fcsFileId, xChannelName, yChannelName, scaleSetId, populationId=NULL, plotType="density", ticks="true", tickLabels="false", axisLabels="true") {
-  url = paste(
-    paste(baseURL, "experiments", experimentId, "plot", sep="/"),
+get_plot <- function(experimentID, FCS_fileID, access_key, x_channel_name, y_channel_name, scale_setID, populationID = NULL, plot_type = "density",
+                   ticks = "true", tick_labels = "false", axis_labels = "true") {
+  opts <- access_key$opts
+  baseURL <- access_key$baseURL
+  url <- paste(
+    paste(baseURL, "experiments", experimentID, "plot", sep="/"),
     paste(
-      paste("fcsFileId", fcsFileId, sep="="),
-      paste("scaleSetId", scaleSetId, sep="="),
-      paste("xChannel", xChannelName, sep="="),
-      paste("yChannel", yChannelName, sep="="),
-      paste("plotType", plotType, sep="="),
+      paste("fcsFileId", FCS_fileID, sep="="),
+      paste("scaleSetId", scale_setID, sep="="),
+      paste("xChannel", x_channel_name, sep="="),
+      paste("yChannel", y_channel_name, sep="="),
+      paste("plotType", plot_type, sep="="),
       paste("ticksQ", ticks, sep="="),
-      paste("tickLabelsQ", tickLabels, sep="="),
-      paste("axisLabelsQ", axisLabels, sep="="),
-      paste("populationId", populationId, sep="="), sep="&"), sep="?")
-  image = readPNG(getURLContent(url, .opts = opts))
+      paste("tickLabelsQ", tick_labels, sep="="),
+      paste("axisLabelsQ", axis_labels, sep="="),
+      paste("populationId", populationID, sep="="), sep="&"), sep="?")
+  image <- png::readPNG(getURLContent(url, .opts = opts))
   # Windows, at least: can't get R to accept units="px". 96 is an example pixels-per-inch value.
   dev.new(width=228/96, height=228/96, units="in")
   par(mar = c(0,0,0,0))
@@ -113,37 +154,47 @@ getPlot = function(experimentId, fcsFileId, xChannelName, yChannelName, scaleSet
 }
 
 #' Retrieve statistic from a population
-#' 
+#'
 #' Returns a desired statistic from a desired feature
-#' @param experimentId the experiment ID as a string
-#' @param fcsFileId the FCS file ID as a string
-#' @param channelName Channel name
-#' @param statisticType Statistic desired, "mean", "median", "quantile", "eventcount
+#' @param experimentID the experiment ID as a string
+#' @param FCS_fileID the FCS file ID as a string
+#' @param access_key An object containing server URL and authentication info: see "authenticate"
+#' @param channel_name Channel name
+#' @param statistic_type Statistic desired, "mean", "median", "quantile", "eventcount
 #' @param k required for statistic "quantile", number from 0.0 to 1.0
+#' @param access_key An object containing server URL and authentication info: see "authenticate"
+#' @export
 
-getStatistic = function(experimentId, fcsFileId, channelName, statisticType, k=NULL, populationId=NULL) {
+get_statistic <- function(experimentID, FCS_fileID, access_key, channel_name, statistic_type, k=NULL, populationID=NULL) {
+  opts <- access_key$opts
+  baseURL <- access_key$baseURL
   url = paste(
-    paste(baseURL, "experiments", experimentId, "statistics", sep="/"),
+    paste(baseURL, "experiments", experimentID, "statistics", sep="/"),
     paste(
-      paste("fcsFileId", fcsFileId, sep="="),
-      paste("channel", channelName, sep="="),
-      paste("statistic", statisticType, sep="="),
+      paste("fcsFileId", FCS_fileID, sep="="),
+      paste("channel", channel_name, sep="="),
+      paste("statistic", statistic_type, sep="="),
       paste("k", k, sep="="),
-      paste("populationId", populationId, sep="="), sep="&"), sep="?")
+      paste("populationId", populationID, sep="="), sep="&"), sep="?")
   return(fromJSON(getURL(url, .opts = opts)))
 }
 
 #' Retrieves events
-#' 
-#' @param experimentId the experiment ID as a string
-#' @param fcsFileId the FCS file ID as a string
-#' @param populationId the population ID as a string
+#'
+#' @param experimentID the experiment ID as a string
+#' @param FCS_fileID the FCS file ID as a string
+#' @param access_key An object containing server URL and authentication info: see "authenticate"
+#' @param populationID the population ID as a string
+#' @export
 
-getEvents = function(experimentId, fcsFileId, populationId=NULL) {
-  url = paste(
-    paste(paste(baseURL, "experiments", experimentId, "fcsfiles", fcsFileId, sep="/"), ".tsv", sep=""),
+get_events <- function(experimentID, FCS_fileID, access_key, populationID=NULL) {
+  opts <- access_key$opts
+  baseURL <- access_key$baseURL
+  jwt <- access_key$jwt
+  url <- paste(
+    paste(paste(baseURL, "experiments", experimentID, "fcsfiles", FCS_fileID, sep="/"), ".tsv", sep=""),
     paste(
-      paste("populationId", populationId, sep="="),
+      paste("populationId", populationID, sep="="),
       paste("token", jwt, sep="="), sep="&"), sep="?")
   return(read.delim(url))
 }

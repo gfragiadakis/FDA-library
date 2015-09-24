@@ -4,14 +4,17 @@
 \alias{authenticate}
 \title{Authenticate acess}
 \usage{
-authenticate(username, password)
+authenticate(username, password, baseURL)
 }
 \arguments{
 \item{username}{The username for the account}
 
 \item{password}{The password for the account}
+
+\item{baseURL}{The URL for the server}
 }
 \description{
 This function establishes the connection to your account on the remote server
+It returns an object containing the server URL and your connection info: opts
 }
 
