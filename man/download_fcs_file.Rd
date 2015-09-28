@@ -11,7 +11,7 @@ download_fcs_file(experimentID, FCS_fileID, local_file_path, access_key)
 
 \item{FCS_fileID}{the FCS file ID as a string}
 
-\item{local_file_path}{path where to download the data}
+\item{local_file_path}{path where to download the data including file name}
 
 \item{access_key}{An object containing server URL and authentication info: see "authenticate"}
 }

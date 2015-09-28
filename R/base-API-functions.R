@@ -66,7 +66,7 @@ get_FCS_files <- function(experimentID, access_key) {
 #' Download an FCS file
 #' @param experimentID the experiment ID as a string
 #' @param FCS_fileID the FCS file ID as a string
-#' @param local_file_path path where to download the data
+#' @param local_file_path path where to download the data including file name
 #' @param access_key An object containing server URL and authentication info: see "authenticate"
 #' @export
 
