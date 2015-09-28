@@ -176,6 +176,7 @@ get_statistic <- function(experimentID, FCS_fileID, access_key, channel_name, st
       paste("statistic", statistic_type, sep="="),
       paste("k", k, sep="="),
       paste("populationId", populationID, sep="="), sep="&"), sep="?")
+  print(url)
   return(fromJSON(getURL(url, .opts = opts)))
 }
 

@@ -9,13 +9,16 @@ experimentID <- experiments[experiments$name == "All Species", '_id']
 FCS_files <- get_FCS_files(experimentID, access_key)
 FCS_files <- FCS_files[1:10, ]
 
+display_parameters(FCS_files, experimentID, access_key)
+
+populations <- c("CD4+T cells", "CD8+T cells", "CD14+ Monocytes")
+reagents <- c("pSTAT1", "pSTAT3", "pMAPKAPK2")
 
 
 
 
 FCS_files$annotations[1]
 
-get_populations(experimentID, access_key)
 
 populationID <- get_populations(experimentID, access_key)[1, '_id']
 scaleID = get_scale_sets(experimentID, access_key)[1, '_id']
