@@ -20,7 +20,7 @@ get_statistic(experimentID, FCS_fileID, access_key, channel_name,
 
 \item{k}{required for statistic "quantile", number from 0.0 to 1.0}
 
-\item{access_key}{An object containing server URL and authentication info: see "authenticate"}
+\item{populationID}{Population ID of population of interest}
 }
 \description{
 Returns a desired statistic from a desired feature

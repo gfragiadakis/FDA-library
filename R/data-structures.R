@@ -9,7 +9,7 @@ get_annotations <- function(FCS_files){
   annotations <- t(sapply(FCS_files$annotations, "[[", "value"))
   colnames(annotations) <- FCS_files$annotations[[1]]$type
 
-  data.frame(file_ID = FCS_files$`_id`, filename = FCS_files$filename, annotations)
+  return(data.frame(file_ID = FCS_files$`_id`, filename = FCS_files$filename, annotations))
 }
 
 #' Display populations and reagents
@@ -34,10 +34,22 @@ display_parameters <- function(FCS_files, experimentID, access_key){
   return(parameters)
 }
 
-#' Get set of statistics when you input populations and reagents
+#' Get set of statistics for chosen features
+#' Specify populations and reagents to generate a feature set of each pair and retrieve statistics
+#' Annotations are optional
+#' @param experimentID the experiment ID as a string
+#' @param FCS_fileID the FCS file ID as a string
+#' @param access_key An object containing server URL and authentication info: see "authenticate"
+#' @param populations A character vector of population names
+#' @param reagents A character vector of reagent names
+#' @param statistic_type Statistic desired, "mean", "median", "quantile", "eventcount"
+#' @param k required for statistic "quantile", number from 0.0 to 1.0
+#' @param annotate Logical operator to indicate whether annotations should be included in returned object
 #' @export
-get_statistics_set <- function(experimentID, FCS_files, access_key, populations, reagents, statistic_type, k = NULL){
-
+#'
+get_statistics_set <- function(experimentID, FCS_files, access_key, populations, reagents,
+                               statistic_type, k = NULL, annotate = FALSE){
+  # TO DO: make colnames of stats_frame match contents in feature set (+ and space issue)
   # make feature set data frame (populations x reagents)
   feature_set <- matrix(0, nrow = length(populations) * length(reagents), ncol = 4)
   colnames(feature_set) <- c("population", "reagent", "channel", "feature")
@@ -54,26 +66,46 @@ get_statistics_set <- function(experimentID, FCS_files, access_key, populations,
     }
   }
 
-  # outer(X, Y, FUN)
-  stat_wrapper <- function(FCS_fileID, feature){
+  # retrieve statistics and organize into a data frame
 
-    pop_object <- get_populations(experimentID, access_key)
-    pop_name <- feature_set$population[feature_set$feature == feature][1]
-    print(pop_object$name)
-    print(pop_name)
-    populationID <- pop_object$`_id`[pop_object$name == pop_name]
+  stats_frame <- matrix(0, nrow = length(FCS_files$`_id`), ncol = length(feature_set$feature))
+  rownames(stats_frame) <- FCS_files$`_id`
+  colnames(stats_frame) <- feature_set$feature
+  stats_frame <- as.data.frame(stats_frame)
 
-    channel_name <- feature_set$channel[feature_set$feature == feature][1]
-    print(channel_name)
+  for (X in 1:length(FCS_files$`_id`)){
 
-    stat <- get_statistic(experimentID, FCS_fileID, access_key, channel_name, statistic_type, k, populationID)
-    return(stat)
+    for (Y in 1:length(feature_set$feature)){
+
+      FCS_fileID <- FCS_files$`_id`[X]
+      feature <- feature_set$feature[Y]
+      pop_object <- get_populations(experimentID, access_key)
+      pop_name <- feature_set$population[feature_set$feature == feature][1]
+      populationID <- pop_object$`_id`[pop_object$name == pop_name]
+
+      channel_name <- feature_set$channel[feature_set$feature == feature][1]
+
+      stat <- get_statistic(experimentID, FCS_fileID, access_key, channel_name, statistic_type, k, populationID)
+      stats_frame[X, Y] <- stat[[1]]
+    }
   }
 
-  X <- FCS_files$`_id`
-  Y <- feature_set$feature
-  outer(X, Y, FUN = stat_wrapper)
+ # inculstion of annotations
 
+  if (annotate == TRUE){
+    annotation_frame <- get_annotations(FCS_files)
+
+    if (all(rownames(stats_frame) ==  annotation_frame$file_ID) == TRUE){
+      annotated_stats_frame <- data.frame(annotation_frame, stats_frame, row.names = NULL)
+
+      return(list(statistics = annotated_stats_frame, feature_object = feature_set))
+
+    } else {
+      print("ERROR: file IDs do not match in annotations and statistics")
+    }
+  } else {
+    return(list(statistics = stats_frame, feature_object = feature_set))
+  }
 }
 
 
