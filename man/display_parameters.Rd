@@ -2,9 +2,7 @@
 % Please edit documentation in R/data-structures.R
 \name{display_parameters}
 \alias{display_parameters}
-\title{Display populations and reagents
-Provides a list of populations and reagents that can be used to select which are desired features
-for subsequent analysis}
+\title{Display populations and reagents}
 \usage{
 display_parameters(FCS_files, experimentID, access_key)
 }
@@ -16,7 +14,6 @@ display_parameters(FCS_files, experimentID, access_key)
 \item{access_key}{An object containing server URL and authentication info: see "authenticate"}
 }
 \description{
-Display populations and reagents
 Provides a list of populations and reagents that can be used to select which are desired features
 for subsequent analysis
 }

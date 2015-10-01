@@ -2,9 +2,7 @@
 % Please edit documentation in R/data-structures.R
 \name{get_statistics_set}
 \alias{get_statistics_set}
-\title{Get set of statistics for chosen features
-Specify populations and reagents to generate a feature set of each pair and retrieve statistics
-Annotations are optional}
+\title{Get set of statistics for chosen features}
 \usage{
 get_statistics_set(experimentID, FCS_files, access_key, populations, reagents,
   statistic_type, k = NULL, annotate = FALSE)
@@ -27,7 +25,6 @@ get_statistics_set(experimentID, FCS_files, access_key, populations, reagents,
 \item{FCS_fileID}{the FCS file ID as a string}
 }
 \description{
-Get set of statistics for chosen features
 Specify populations and reagents to generate a feature set of each pair and retrieve statistics
 Annotations are optional
 }

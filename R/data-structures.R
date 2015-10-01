@@ -1,7 +1,7 @@
 #' Get annotations for a set of FCS files
+#'
 #' @param FCS_files Object containing FCS files
 #' @export
-
 
 
 get_annotations <- function(FCS_files){
@@ -13,6 +13,7 @@ get_annotations <- function(FCS_files){
 }
 
 #' Display populations and reagents
+#'
 #' Provides a list of populations and reagents that can be used to select which are desired features
 #' for subsequent analysis
 #' @param FCS_files Object containing FCS files
@@ -34,7 +35,19 @@ display_parameters <- function(FCS_files, experimentID, access_key){
   return(parameters)
 }
 
+#' Convert names
+#'
+#' Convert names for compatibility in R
+#' @param x A vector of names
+#' @export
+
+convert_names <- function(x){
+  new_names <- make.names(x, unique = TRUE)
+  return(new_names)
+}
+
 #' Get set of statistics for chosen features
+#'
 #' Specify populations and reagents to generate a feature set of each pair and retrieve statistics
 #' Annotations are optional
 #' @param experimentID the experiment ID as a string
@@ -70,7 +83,7 @@ get_statistics_set <- function(experimentID, FCS_files, access_key, populations,
 
   stats_frame <- matrix(0, nrow = length(FCS_files$`_id`), ncol = length(feature_set$feature))
   rownames(stats_frame) <- FCS_files$`_id`
-  colnames(stats_frame) <- feature_set$feature
+  colnames(stats_frame) <- convert_names(feature_set$feature)
   stats_frame <- as.data.frame(stats_frame)
 
   for (X in 1:length(FCS_files$`_id`)){
@@ -89,6 +102,9 @@ get_statistics_set <- function(experimentID, FCS_files, access_key, populations,
       stats_frame[X, Y] <- stat[[1]]
     }
   }
+
+  # convert names in feature object
+  feature_set <- as.data.frame(apply(feature_set, 2, convert_names))
 
  # inculstion of annotations
 
