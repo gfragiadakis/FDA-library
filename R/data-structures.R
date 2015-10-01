@@ -42,8 +42,7 @@ display_parameters <- function(FCS_files, experimentID, access_key){
 #' @export
 
 convert_names <- function(x){
-  new_names <- make.names(x, unique = TRUE)
-  return(new_names)
+  new_names <- make.names(x)
 }
 
 #' Get set of statistics for chosen features
