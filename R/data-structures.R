@@ -1,3 +1,7 @@
+# These are functions pertaining to creating the building block structures of the data
+# including annotations, features, and queried statistics
+
+
 #' Get annotations for a set of FCS files
 #'
 #' @param FCS_files Object containing FCS files
@@ -61,7 +65,6 @@ convert_names <- function(x){
 #'
 get_statistics_set <- function(experimentID, FCS_files, access_key, populations, reagents,
                                statistic_type, k = NULL, annotate = FALSE){
-  # TO DO: make colnames of stats_frame match contents in feature set (+ and space issue)
   # make feature set data frame (populations x reagents)
   feature_set <- matrix(0, nrow = length(populations) * length(reagents), ncol = 4)
   colnames(feature_set) <- c("population", "reagent", "channel", "feature")
@@ -123,5 +126,58 @@ get_statistics_set <- function(experimentID, FCS_files, access_key, populations,
   }
 }
 
+#' Generate fold change statistics object
+#'
+#' Takes a statistics object and presents statistics relative to designated baseline
+#' Options exist for asinh ratio or fold change on raw counts
+#'
+#'@param statistics_object object output of get_statistics function
+#'@param basal_name name of the basal condition as string e.g. "Basal"
+#'@param fold_type either "asinh", calculates asinh ratio, or "raw", fold of raw counts
+#'@export
+#'@import reshape2
+#'@import dplyr
+
+get_folds <- function(statistics_object, basal_name, fold_type){
+
+  df <- statistics_object$statistics
+
+  base_df <- df %>%
+    dplyr::select( -file_ID, -filename) %>%
+    dplyr::filter(Condition == basal_name) %>%
+    dplyr::rename(Base_Condition = Condition) %>%
+    reshape2::melt() %>%
+    dplyr::rename(Base_Value = value)
+
+
+  stim_df <- df %>%
+    dplyr::select(-file_ID, -filename) %>%
+    dplyr::filter(Condition != basal_name) %>%
+    dplyr::rename(Stim_Condition = Condition) %>%
+    reshape2::melt() %>%
+    dplyr::rename(Stim_Value = value)
+
+  if (fold_type == "asinh"){
+
+    base_df$Base_Value <- asinh(base_df$Base_Value/5)
+    stim_df$Stim_Value <- asinh(stim_df$Stim_Value/5)
+
+    new_df <- merge(stim_df, base_df) %>%
+      dplyr::mutate(fold_value = Stim_Value - Base_Value) %>%
+      dplyr::select(-Base_Condition, -Base_Value, -Stim_Value) %>%
+      dplyr::rename(Condition = Stim_Condition) %>%
+      reshape2::dcast(., Donor + Species + Gender + Condition ~ variable)
+
+  } else if (fold_type == "raw"){
+
+    new_df <- merge(stim_df, base_df) %>%
+      dplyr::mutate(fold_value = Stim_Value / Base_Value) %>%
+      dplyr::select(-Base_Condition, -Base_Value, -Stim_Value) %>%
+      dplyr::rename(Condition = Stim_Condition) %>%
+      reshape2::dcast(., Donor + Species + Gender + Condition ~ variable)
+  }
+  return(new_df)
+
+}
 
 

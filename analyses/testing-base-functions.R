@@ -14,11 +14,7 @@ display_parameters(FCS_files, experimentID, access_key)
 populations <- c("CD4+T cells", "CD8+T cells", "CD14+ Monocytes")
 reagents <- c("pSTAT1", "pSTAT3", "pMAPKAPK2")
 
+results <- get_statistics_set(experimentID, FCS_files, access_key, populations, reagents,
+                              statistic_type = "median", k = NULL, annotate = TRUE)
 
 
-
-FCS_files$annotations[1]
-
-
-populationID <- get_populations(experimentID, access_key)[1, '_id']
-scaleID = get_scale_sets(experimentID, access_key)[1, '_id']
