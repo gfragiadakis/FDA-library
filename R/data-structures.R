@@ -1,7 +1,6 @@
 # These are functions pertaining to creating the building block structures of the data
 # including annotations, features, and queried statistics
 
-
 #' Get annotations for a set of FCS files
 #'
 #' @param FCS_files Object containing FCS files
@@ -55,12 +54,22 @@ convert_names <- function(x){
 #' Annotations are optional
 #' @param experimentID the experiment ID as a string
 #' @param FCS_fileID the FCS file ID as a string
-#' @param access_key An object containing server URL and authentication info: see "authenticate"
-#' @param populations A character vector of population names
-#' @param reagents A character vector of reagent names
-#' @param statistic_type Statistic desired, "mean", "median", "quantile", "eventcount"
+#' @param access_key an object containing server URL and authentication info: see "authenticate"
+#' @param populations character vector of population names
+#' @param reagents character vector of reagent names
+#' @param statistic_type statistic desired, "mean", "median", "quantile", "eventcount"
 #' @param k required for statistic "quantile", number from 0.0 to 1.0
-#' @param annotate Logical operator to indicate whether annotations should be included in returned object
+#' @param annotate logical operator to indicate whether annotation00s should be included in returned object
+#' @examples
+#' access_key <- authenticate("my_username", "my_password",
+#'                            baseURL =  "http://52.27.144.218/api/v1")
+#' experiments <- get_experiments(access_key)
+#' experimentID <- experiments[experiments$name == "experiment_name", '_id']
+#' FCS_fileID <- get_FCS_files(experimentID, access_key)[1, "_id"]
+#' populations <- c("CD4+T cells", "CD8+T cells", "CD14+ Monocytes")
+#' reagents <- c("pSTAT1", "pSTAT3", "pMAPKAPK2")
+#' get_statistic_set(experimentID, FCS_files, access_key, populations, reagents,
+#'                    statistic_type = "median", k = NULL, annotate = TRUE)
 #' @export
 #'
 get_statistics_set <- function(experimentID, FCS_files, access_key, populations, reagents,

@@ -9,9 +9,16 @@ get_experiment(experimentID, access_key)
 \arguments{
 \item{experimentID}{the experiment ID as a string}
 
-\item{access_key}{An object containing server URL and authentication info: see "authenticate"}
+\item{access_key}{an object containing server URL and authentication info: see "authenticate"}
 }
 \description{
 This function retrieves an object with the information from one experiment specified by the experiment ID
+}
+\examples{
+access_key <- authenticate("my_username", "my_password",
+                           baseURL =  "http://52.27.144.218/api/v1")
+experiments <- get_experiments(access_key)
+experimentID <- experiments[experiments$name == "experiment_name", '_id']
+get_experiment(experimentID, access_key)
 }
 

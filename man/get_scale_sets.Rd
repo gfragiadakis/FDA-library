@@ -9,9 +9,16 @@ get_scale_sets(experimentID, access_key)
 \arguments{
 \item{experimentID}{the experiment ID as a string}
 
-\item{access_key}{An object containing server URL and authentication info: see "authenticate"}
+\item{access_key}{an object containing server URL and authentication info: see "authenticate"}
 }
 \description{
 Get all scale sets for an experiment
+}
+\examples{
+access_key <- authenticate("my_username", "my_password",
+                           baseURL =  "http://52.27.144.218/api/v1")
+experiments <- get_experiments(access_key)
+experimentID <- experiments[experiments$name == "experiment_name", '_id']
+get_scale_sets(experimentID, access_key)
 }
 

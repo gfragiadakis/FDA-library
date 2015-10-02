@@ -25,4 +25,13 @@ get_statistic(experimentID, FCS_fileID, access_key, channel_name,
 \description{
 Returns a desired statistic from a desired feature
 }
+\examples{
+access_key <- authenticate("my_username", "my_password",
+                           baseURL =  "http://52.27.144.218/api/v1")
+experiments <- get_experiments(access_key)
+experimentID <- experiments[experiments$name == "experiment_name", '_id']
+FCS_fileID <- get_FCS_files(experimentID, access_key)[1, "_id"]
+get_statistic(experimentID, FCS_fileID, access_key, channel_name = "La139i",
+               statistic_type = "median", k=NULL, populationID=NULL)
+}
 

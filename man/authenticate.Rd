@@ -7,14 +7,18 @@
 authenticate(username, password, baseURL)
 }
 \arguments{
-\item{username}{The username for the account}
+\item{username}{username for the account}
 
-\item{password}{The password for the account}
+\item{password}{password for the account}
 
-\item{baseURL}{The URL for the server}
+\item{baseURL}{URL for the server}
 }
 \description{
 This function establishes the connection to your account on the remote server
-It returns an object containing the server URL and your connection info: opts
+It returns an object containing the server URL and your connection information
+}
+\examples{
+authenticate("my_username", "my_password",
+             baseURL =  "http://52.27.144.218/api/v1")
 }
 

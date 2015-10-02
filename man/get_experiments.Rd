@@ -7,11 +7,16 @@
 get_experiments(access_key)
 }
 \arguments{
-\item{access_key}{An object containing server URL and authentication info: see "authenticate"}
+\item{access_key}{an object containing server URL and authentication info: see "authenticate"}
 
-\item{baseURL}{The URL for the server}
+\item{baseURL}{URL for the server}
 }
 \description{
 This function retrieves an object with the information about all acessible experiments
+}
+\examples{
+access_key <- authenticate("my_username", "my_password",
+                           baseURL =  "http://52.27.144.218/api/v1")
+experiments <- get_experiments(access_key)
 }
 

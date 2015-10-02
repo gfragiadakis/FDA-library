@@ -1,10 +1,13 @@
 #' Authenticate acess
 #'
 #' This function establishes the connection to your account on the remote server
-#' It returns an object containing the server URL and your connection info: opts
-#' @param username The username for the account
-#' @param password The password for the account
-#' @param baseURL The URL for the server
+#' It returns an object containing the server URL and your connection information
+#' @param username username for the account
+#' @param password password for the account
+#' @param baseURL URL for the server
+#' @examples
+#' authenticate("my_username", "my_password",
+#'              baseURL =  "http://52.27.144.218/api/v1")
 #' @import jsonlite
 #' @import RCurl
 #' @export
@@ -22,8 +25,12 @@ authenticate <- function(username, password, baseURL) {
 #' Retrieve all accessible experiments
 #'
 #' This function retrieves an object with the information about all acessible experiments
-#' @param baseURL The URL for the server
-#' @param access_key An object containing server URL and authentication info: see "authenticate"
+#' @param baseURL URL for the server
+#' @param access_key an object containing server URL and authentication info: see "authenticate"
+#' @examples
+#' access_key <- authenticate("my_username", "my_password",
+#'                            baseURL =  "http://52.27.144.218/api/v1")
+#' experiments <- get_experiments(access_key)
 #' @import jsonlite
 #' @import RCurl
 #' @export
@@ -39,7 +46,13 @@ get_experiments <- function(access_key) {
 #'
 #' This function retrieves an object with the information from one experiment specified by the experiment ID
 #' @param experimentID the experiment ID as a string
-#' @param access_key An object containing server URL and authentication info: see "authenticate"
+#' @param access_key an object containing server URL and authentication info: see "authenticate"
+#' @examples
+#' access_key <- authenticate("my_username", "my_password",
+#'                            baseURL =  "http://52.27.144.218/api/v1")
+#' experiments <- get_experiments(access_key)
+#' experimentID <- experiments[experiments$name == "experiment_name", '_id']
+#' get_experiment(experimentID, access_key)
 #' @export
 
 get_experiment <- function(experimentID, access_key) {
@@ -53,7 +66,13 @@ get_experiment <- function(experimentID, access_key) {
 #'
 #' Returns an object containing all FCS files from the experiments based on the experiment ID
 #' @param experimentID the experiment ID as a string
-#' @param access_key An object containing server URL and authentication info: see "authenticate"
+#' @param access_key an object containing server URL and authentication info: see "authenticate"
+#' @examples
+#' access_key <- authenticate("my_username", "my_password",
+#'                            baseURL =  "http://52.27.144.218/api/v1")
+#' experiments <- get_experiments(access_key)
+#' experimentID <- experiments[experiments$name == "experiment_name", '_id']
+#' get_FCS_files(experimentID, access_key)
 #' @export
 
 get_FCS_files <- function(experimentID, access_key) {
@@ -67,7 +86,7 @@ get_FCS_files <- function(experimentID, access_key) {
 #' @param experimentID the experiment ID as a string
 #' @param FCS_fileID the FCS file ID as a string
 #' @param local_file_path path where to download the data including file name
-#' @param access_key An object containing server URL and authentication info: see "authenticate"
+#' @param access_key an object containing server URL and authentication info: see "authenticate"
 #' @export
 
 download_fcs_file <- function(experimentID, FCS_fileID, local_file_path, access_key) {
@@ -94,7 +113,13 @@ get_gates <- function(experimentID, access_key) {
 
 #' Get all populations for an experiment
 #' @param experimentID the experiment ID as a string
-#' @param access_key An object containing server URL and authentication info: see "authenticate"
+#' @param access_key an object containing server URL and authentication info: see "authenticate"
+#' @examples
+#' access_key <- authenticate("my_username", "my_password",
+#'                            baseURL =  "http://52.27.144.218/api/v1")
+#' experiments <- get_experiments(access_key)
+#' experimentID <- experiments[experiments$name == "experiment_name", '_id']
+#' get_populations(experimentID, access_key)
 #' @export
 
 get_populations <- function(experimentID, acess_key) {
@@ -106,7 +131,13 @@ get_populations <- function(experimentID, acess_key) {
 
 #' Get all scale sets for an experiment
 #' @param experimentID the experiment ID as a string
-#' @param access_key An object containing server URL and authentication info: see "authenticate"
+#' @param access_key an object containing server URL and authentication info: see "authenticate"
+#' @examples
+#' access_key <- authenticate("my_username", "my_password",
+#'                            baseURL =  "http://52.27.144.218/api/v1")
+#' experiments <- get_experiments(access_key)
+#' experimentID <- experiments[experiments$name == "experiment_name", '_id']
+#' get_scale_sets(experimentID, access_key)
 #' @export
 
 get_scale_sets <- function(experimentID, access_key) {
@@ -163,6 +194,14 @@ get_plot <- function(experimentID, FCS_fileID, access_key, x_channel_name, y_cha
 #' @param statistic_type Statistic desired, "mean", "median", "quantile", "eventcount
 #' @param k required for statistic "quantile", number from 0.0 to 1.0
 #' @param populationID Population ID of population of interest
+#' @examples
+#' access_key <- authenticate("my_username", "my_password",
+#'                            baseURL =  "http://52.27.144.218/api/v1")
+#' experiments <- get_experiments(access_key)
+#' experimentID <- experiments[experiments$name == "experiment_name", '_id']
+#' FCS_fileID <- get_FCS_files(experimentID, access_key)[1, "_id"]
+#' get_statistic(experimentID, FCS_fileID, access_key, channel_name = "La139i",
+#'                statistic_type = "median", k=NULL, populationID=NULL)
 #' @export
 
 get_statistic <- function(experimentID, FCS_fileID, access_key, channel_name, statistic_type, k=NULL, populationID=NULL) {
