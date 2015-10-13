@@ -200,14 +200,14 @@ get_plot <- function(experimentID, FCS_fileID, access_key, x_channel_name, y_cha
 #' experiments <- get_experiments(access_key)
 #' experimentID <- experiments[experiments$name == "experiment_name", '_id']
 #' FCS_fileID <- get_FCS_files(experimentID, access_key)[1, "_id"]
-#' get_statistic(experimentID, FCS_fileID, access_key, channel_name = "La139i",
+#' get_statistic(experimentID, FCS_fileID, access_key, channel_name = "La139Di",
 #'                statistic_type = "median", k=NULL, populationID=NULL)
 #' @export
 
 get_statistic <- function(experimentID, FCS_fileID, access_key, channel_name, statistic_type, k=NULL, populationID=NULL) {
   opts <- access_key$opts
   baseURL <- access_key$baseURL
-  url = paste(
+  url <- paste(
     paste(baseURL, "experiments", experimentID, "statistics", sep="/"),
     paste(
       paste("fcsFileId", FCS_fileID, sep="="),
@@ -216,6 +216,40 @@ get_statistic <- function(experimentID, FCS_fileID, access_key, channel_name, st
       paste("k", k, sep="="),
       paste("populationId", populationID, sep="="), sep="&"), sep="?")
   return(fromJSON(getURL(url, .opts = opts)))
+}
+
+#' Retrieve statistic URL from a population
+#'
+#' Returns a desired statistic from a desired feature
+#' @param experimentID the experiment ID as a string
+#' @param FCS_fileID the FCS file ID as a string
+#' @param access_key An object containing server URL and authentication info: see "authenticate"
+#' @param channel_name Channel name
+#' @param statistic_type Statistic desired, "mean", "median", "quantile", "eventcount
+#' @param k required for statistic "quantile", number from 0.0 to 1.0
+#' @param populationID Population ID of population of interest
+#' @examples
+#' access_key <- authenticate("my_username", "my_password",
+#'                            baseURL =  "http://52.27.144.218/api/v1")
+#' experiments <- get_experiments(access_key)
+#' experimentID <- experiments[experiments$name == "experiment_name", '_id']
+#' FCS_fileID <- get_FCS_files(experimentID, access_key)[1, "_id"]
+#' get_statistic_url(experimentID, FCS_fileID, access_key, channel_name = "La139Di",
+#'                statistic_type = "median", k=NULL, populationID=NULL)
+#' @export
+
+get_statistic_url <- function(experimentID, FCS_fileID, access_key, channel_name, statistic_type, k=NULL, populationID=NULL) {
+  opts <- access_key$opts
+  baseURL <- access_key$baseURL
+  url <- paste(
+    paste(baseURL, "experiments", experimentID, "statistics", sep="/"),
+    paste(
+      paste("fcsFileId", FCS_fileID, sep="="),
+      paste("channel", channel_name, sep="="),
+      paste("statistic", statistic_type, sep="="),
+      paste("k", k, sep="="),
+      paste("populationId", populationID, sep="="), sep="&"), sep="?")
+  return(url)
 }
 
 #' Retrieves events

@@ -17,4 +17,26 @@ reagents <- c("pSTAT1", "pSTAT3", "pMAPKAPK2")
 results <- get_statistics_set(experimentID, FCS_files, access_key, populations, reagents,
                               statistic_type = "median", k = NULL, annotate = TRUE)
 
+results_parallel <- get_statistics_set_parallel(experimentID, FCS_files, access_key, populations, reagents,
+                                    statistic_type = "median", k = NULL, annotate = TRUE)
+
+# Run this for trials
+
+time_original <- system.time((results = get_statistics_set(experimentID, FCS_files, access_key, populations, reagents,
+                              statistic_type = "median", k = NULL, annotate = TRUE)))
+
+time_parallel_14 <- system.time((results_parallel_14 = get_statistics_set_parallel(experimentID, FCS_files, access_key, populations, reagents,
+                                                                             statistic_type = "median", k = NULL, b= 14, annotate = TRUE)))
+
+
+time_parallel_2 <- system.time((get_statistics_set_parallel(experimentID, FCS_files, access_key, populations, reagents,
+                                                                                   statistic_type = "median", k = NULL, b = 2, annotate = TRUE)))
+
+time_parallel_4 <- system.time((get_statistics_set_parallel(experimentID, FCS_files, access_key, populations, reagents,
+                                                            statistic_type = "median", k = NULL, b = 4, annotate = TRUE)))
+
+time_parallel_6 <- system.time((get_statistics_set_parallel(experimentID, FCS_files, access_key, populations, reagents,
+                                                            statistic_type = "median", k = NULL, b = 6, annotate = TRUE)))
+
+
 
