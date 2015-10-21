@@ -209,7 +209,7 @@ get_statistics_set_parallel <- function(experimentID, FCS_files, access_key, pop
   r <- c()
   for (i in 1:length(ind_list)){
     ind <- ind_list[[i]]
-    r0 <- getURIAsynchronous(url = stat_urls[ind], .opts = access_key$opts)
+    r0 <- getURL(url = stat_urls[ind], .opts = access_key$opts)
     r <- c(r, r0)
   }
   #r <- getURIAsynchronous(url = stat_urls, .opts = access_key$opts)
@@ -239,7 +239,7 @@ get_statistics_set_parallel <- function(experimentID, FCS_files, access_key, pop
       print("ERROR: file IDs do not match in annotations and statistics")
     }
   } else {
-    return(list(statistics = stats_frame, feature_object = feature_set))
+    return(list(statistics = stats_frame, feature_object = feature_set, stat_urls = stat_urls))
   }
 }
 
@@ -296,5 +296,32 @@ get_folds <- function(statistics_object, basal_name, fold_type){
   return(new_df)
 
 }
+
+#' Get URIs: giving it a shot
+#' @export
+
+getURIs =
+  function(uris, ..., multiHandle = RCurl::getCurlMultiHandle(), .perform = TRUE)
+  {
+    content = list()
+    curls = list()
+
+    for(i in uris) {
+      curl = getCurlHandle()
+      content[[i]] = basicTextGatherer()
+      opts = curlOptions(URL = i, writefunction = content[[i]]$update, ..., httpheader = access_key$opts[[1]])
+      curlSetOpt(.opts = opts, curl = curl)
+      multiHandle = push(multiHandle, curl)
+    }
+
+    if(.perform) {
+      complete(multiHandle)
+      lapply(content, function(x) x$value())
+    } else {
+      return(list(multiHandle = multiHandle, content = content))
+    }
+  }
+
+
 
 
