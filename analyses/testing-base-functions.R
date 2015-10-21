@@ -12,7 +12,7 @@ FCS_files <- FCS_files[1:10, ]
 
 display_parameters(FCS_files, experimentID, access_key)
 
-# if you need a quick set of parameters
+### if you need a quick set of parameters
 populations <- get_populations(experimentID, access_key)
 populationID <- populations$`_id`[1]
 channel_name <- "Dy161Di"
