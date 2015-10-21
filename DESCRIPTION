@@ -9,4 +9,7 @@ LazyData: true
 Imports:
 	RCurl,
 	jsonlite,
-	png
+	png,
+	reshape2,
+	dplyr
+	
