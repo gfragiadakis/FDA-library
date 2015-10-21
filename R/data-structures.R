@@ -296,32 +296,3 @@ get_folds <- function(statistics_object, basal_name, fold_type){
   return(new_df)
 
 }
-
-#' Get URIs: giving it a shot
-#' @export
-
-getURIs =
-  function(uris, ..., multiHandle = RCurl::getCurlMultiHandle(), .perform = TRUE)
-  {
-    content = list()
-    curls = list()
-
-    for(i in uris) {
-      curl = getCurlHandle()
-      content[[i]] = basicTextGatherer()
-      opts = curlOptions(URL = i, writefunction = content[[i]]$update, ..., httpheader = access_key$opts[[1]])
-      curlSetOpt(.opts = opts, curl = curl)
-      multiHandle = push(multiHandle, curl)
-    }
-
-    if(.perform) {
-      complete(multiHandle)
-      lapply(content, function(x) x$value())
-    } else {
-      return(list(multiHandle = multiHandle, content = content))
-    }
-  }
-
-
-
-
