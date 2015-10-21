@@ -1,5 +1,5 @@
 library("FDAlibrary")
-access_key <- authenticate("gfragiadakis", "Anatoli4%Riza", baseURL =  "http://52.27.144.218/api/v1")
+access_key <- authenticate("gfragiadakis", "password", baseURL =  "http://52.27.144.218/api/v1")
 
 experiments <- get_experiments(access_key)
 
