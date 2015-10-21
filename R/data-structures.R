@@ -204,15 +204,15 @@ get_statistics_set_parallel <- function(experimentID, FCS_files, access_key, pop
     }
   }
 
-  d <- 1:length(stat_urls)
-  ind_list <- split(d, ceiling(seq_along(d)/b))
-  r <- c()
-  for (i in 1:length(ind_list)){
-    ind <- ind_list[[i]]
-    r0 <- getURL(url = stat_urls[ind], .opts = access_key$opts)
-    r <- c(r, r0)
-  }
-  #r <- getURIAsynchronous(url = stat_urls, .opts = access_key$opts)
+  #d <- 1:length(stat_urls)
+  #ind_list <- split(d, ceiling(seq_along(d)/b))
+  #r <- c()
+  #for (i in 1:length(ind_list)){
+  #  ind <- ind_list[[i]]
+  #  r0 <- getURL(url = stat_urls[ind], .opts = access_key$opts)
+  #  r <- c(r, r0)
+  #}
+  r <- getURIAsynchronous(url = stat_urls, .opts = access_key$opts)
   r2 <- lapply(r, fromJSON)
   stats_vec <- sapply(r2, function(x) x[[1]])
 
