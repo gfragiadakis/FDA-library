@@ -7,14 +7,15 @@
 get_folds(statistics_object, basal_name, fold_type)
 }
 \arguments{
-\item{statistics_object}{object output of get_statistics function}
+\item{statistics_object}{data frame of statistics}
 
 \item{basal_name}{name of the basal condition as string e.g. "Basal"}
 
 \item{fold_type}{either "asinh", calculates asinh ratio, or "raw", fold of raw counts}
 }
 \description{
-Takes a statistics object and presents statistics relative to designated baseline
-Options exist for asinh ratio or fold change on raw counts
+Takes a statistics object and presents statistics relative to designated baseline.
+Options exist for asinh ratio or fold change on raw counts.
+If using a statistics object that is an output of a get_statistics function, use statistics_object$statistics
 }
 

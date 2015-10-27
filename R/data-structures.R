@@ -245,10 +245,11 @@ get_statistics_set_parallel <- function(experimentID, FCS_files, access_key, pop
 
 #' Generate fold change statistics object
 #'
-#' Takes a statistics object and presents statistics relative to designated baseline
-#' Options exist for asinh ratio or fold change on raw counts
+#' Takes a statistics object and presents statistics relative to designated baseline.
+#' Options exist for asinh ratio or fold change on raw counts.
+#' If using a statistics object that is an output of a get_statistics function, use statistics_object$statistics
 #'
-#'@param statistics_object object output of get_statistics function
+#'@param statistics_object data frame of statistics
 #'@param basal_name name of the basal condition as string e.g. "Basal"
 #'@param fold_type either "asinh", calculates asinh ratio, or "raw", fold of raw counts
 #'@export
@@ -257,7 +258,7 @@ get_statistics_set_parallel <- function(experimentID, FCS_files, access_key, pop
 
 get_folds <- function(statistics_object, basal_name, fold_type){
 
-  df <- statistics_object$statistics
+  df <- statistics_object
 
   base_df <- df %>%
     dplyr::select( -file_ID, -filename) %>%
