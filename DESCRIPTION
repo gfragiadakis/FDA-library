@@ -12,4 +12,5 @@ Imports:
 	png,
 	reshape2,
 	dplyr
+	ggplot2
 	
