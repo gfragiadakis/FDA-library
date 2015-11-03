@@ -297,3 +297,43 @@ get_folds <- function(statistics_object, basal_name, fold_type){
   return(new_df)
 
 }
+
+#' Filter features at a given threshold
+#'
+#' Filters features per condition based on whether the absolute value of the median across
+#' samples is greater than the specified threshold
+#' @param data data frame of features, see examples
+#' @param threshold threshold for absolute value of the median feature per condition
+#' @export
+#' @import dplyr
+#' @import reshape2
+#' @examples
+#' To be completed
+
+threshold_features <- function(data, threshold){
+
+  compiled_df <- data.frame()
+
+  for (i in levels(data$Condition)){
+
+    if (i != "Basal"){
+
+      df <- data %>%
+        dplyr::filter(Condition == i) %>%
+        reshape2::melt(variable.name = "Feature")
+
+      df_grouped <- dplyr::group_by(df, Feature)
+      df_stats <- dplyr::summarise(df_grouped, mean = mean(value))
+
+      thresholded_features <- df_stats$Feature[abs(df_stats$mean) >= threshold]
+
+      new_df <- dplyr::filter(df, Feature %in% thresholded_features)
+      compiled_df <- rbind(compiled_df, new_df)
+    }
+
+  }
+
+  compiled_df <- dplyr::mutate(compiled_df, Condition_Feature = paste(Condition, Feature, sep = "_"))
+  compiled_df$Condition_Feature <- as.factor(compiled_df$Condition_Feature)
+  return(compiled_df)
+}
