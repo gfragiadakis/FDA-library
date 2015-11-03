@@ -11,6 +11,6 @@ Imports:
 	jsonlite,
 	png,
 	reshape2,
-	dplyr
+	dplyr,
 	ggplot2
 	
