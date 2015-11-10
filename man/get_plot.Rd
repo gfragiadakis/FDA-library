@@ -23,5 +23,6 @@ get_plot(experimentID, FCS_fileID, access_key, x_channel_name, y_channel_name,
 }
 \description{
 Creates a plot of specified channels and populations
+This is in beta mode and needs to be refined for nicer output
 }
 

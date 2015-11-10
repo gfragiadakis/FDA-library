@@ -9,9 +9,9 @@ get_gates(experimentID, access_key)
 \arguments{
 \item{experimentID}{the experiment ID as a string}
 
-\item{access_key}{An object containing server URL and authentication info: see "authenticate"}
+\item{access_key}{an object containing server URL and authentication info: see "authenticate"}
 }
 \description{
-Get all gates for an experiment
+Returns a data frame with the information on all gates from an experiment including names, dimensions, tailored, etc.
 }
 

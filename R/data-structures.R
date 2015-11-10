@@ -3,11 +3,17 @@
 
 #' Get annotations for a set of FCS files
 #'
+#' If some files are not annotated, it will return a warning and only return the fcs files and annotations only
 #' @param FCS_files Object containing FCS files
 #' @export
 
 
 get_annotations <- function(FCS_files){
+
+  if (sum(sapply(FCS_file_list$annotations, nrow) == 0) != 0){
+    FCS_files <- FCS_files[sapply(FCS_file_list$annotations, nrow) != 0, ]
+    print("Warning: missing annotations in experiment, returning truncated file frame")
+  } else {}
 
   annotations <- t(sapply(FCS_files$annotations, "[[", "value"))
   colnames(annotations) <- FCS_files$annotations[[1]]$type
@@ -17,7 +23,7 @@ get_annotations <- function(FCS_files){
 
 #' Display populations and reagents
 #'
-#' Provides a list of populations and reagents that can be used to select which are desired features
+#' Provides a list of population and reagent names that can be used to select which are desired features
 #' for subsequent analysis
 #' @param FCS_files Object containing FCS files
 #' @param experimentID the experiment ID as a string
@@ -40,7 +46,7 @@ display_parameters <- function(FCS_files, experimentID, access_key){
 
 #' Convert names
 #'
-#' Convert names for compatibility in R
+#' Convert names for compatibility in R, removing promblematic characters such as "+" of spaces
 #' @param x A vector of names
 #' @export
 
@@ -251,19 +257,22 @@ get_statistics_set_parallel <- function(experimentID, FCS_files, access_key, pop
 #' Must contain "Condition" column
 #' Unique identifier columns such as filename, File ID, etc must be specified as arguments for removal
 #'
-#'@param statistics_object data frame of statistics
+#'@param statistics_frame data frame of statistics
 #'@param basal_name name of the basal condition as string e.g. "Basal"
-#'@param fold_type either "asinh", calculates asinh ratio, or "raw", fold of raw counts
-#'@param unique_IDs a vector of strings that are the names of the unique identifier columns
-#'@param annotation_columns vector of strings that are the names of the annotation columns
+#'@param fold_type either "asinh", which calculates asinh ratio, or "raw", which calculates the fold change in raw counts
+#'@param unique_IDs a vector of strings that are the names of the unique identifier columns (e.g. file_ID or filename)
+#'@param annotation_columns vector of strings that are the names of the annotation columns (e.g. "Donor", "Species", "Gender", "Condition")
+#'@example
+#' get_folds(statistics_frame = statistics_object$statistics, basal_name = "Basal", fold_type = "asinh", unique_IDs = c("file_ID", "filename"),
+#'              annotation_columns = c("Donor","Species", "Gender","Condition"))
 #'@export
 #'@import reshape2
 #'@import dplyr
 
-get_folds <- function(statistics_object, basal_name, fold_type, unique_IDs = c("file_ID", "filename"),
+get_folds <- function(statistics_frame, basal_name, fold_type, unique_IDs = c("file_ID", "filename"),
                       annotation_columns = c("Donor","Species", "Gender","Condition")){
 
-  df <- statistics_object
+  df <- statistics_frame
   df <- df[, !(colnames(df) %in% unique_IDs)]
 
   formula <- as.formula(paste(paste(annotation_columns, collapse = " + "), "variable", sep = " ~ "))
@@ -308,13 +317,15 @@ get_folds <- function(statistics_object, basal_name, fold_type, unique_IDs = c("
 #'
 #' Filters features per condition based on whether the absolute value of the median across
 #' samples is greater than the specified threshold
-#' @param data data frame of features, see examples
-#' @param threshold threshold for absolute value of the median feature per condition
+#' @param data data frame of fold features (see get_folds function)
+#' @param threshold threshold for absolute value of the median fold feature per condition
 #' @export
 #' @import dplyr
 #' @import reshape2
 #' @examples
-#' To be completed
+#' fold_feature_data <- get_folds(statistics_frame = statistics_object$statistics, basal_name = "Basal", fold_type = "asinh", unique_IDs = c("file_ID", "filename"),
+#'              annotation_columns = c("Donor","Species", "Gender","Condition"))
+#' threshold_features(data = fold_feature_data, threshold = 0.2)
 
 threshold_features <- function(data, threshold){
 

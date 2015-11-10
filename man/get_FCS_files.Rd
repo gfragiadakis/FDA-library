@@ -12,11 +12,12 @@ get_FCS_files(experimentID, access_key)
 \item{access_key}{an object containing server URL and authentication info: see "authenticate"}
 }
 \description{
-Returns an object containing all FCS files from the experiments based on the experiment ID
+Returns a data frame containing all FCS files from an experiment based on the experiment ID
+Lists information about event count, panel, and annotations
 }
 \examples{
 access_key <- authenticate("my_username", "my_password",
-                           baseURL =  "http://52.27.144.218/api/v1")
+                           baseURL =  "http://54.186.1.226/api/v1")
 experiments <- get_experiments(access_key)
 experimentID <- experiments[experiments$name == "experiment_name", '_id']
 get_FCS_files(experimentID, access_key)

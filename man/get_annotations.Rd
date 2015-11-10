@@ -10,6 +10,6 @@ get_annotations(FCS_files)
 \item{FCS_files}{Object containing FCS files}
 }
 \description{
-Get annotations for a set of FCS files
+If some files are not annotated, it will return a warning and only return the fcs files and annotations only
 }
 

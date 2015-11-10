@@ -4,18 +4,32 @@
 \alias{download_fcs_file}
 \title{Download an FCS file}
 \usage{
-download_fcs_file(experimentID, FCS_fileID, local_file_path, access_key)
+download_fcs_file(experimentID, FCS_fileID, local_file_path, filename,
+  access_key)
 }
 \arguments{
 \item{experimentID}{the experiment ID as a string}
 
 \item{FCS_fileID}{the FCS file ID as a string}
 
-\item{local_file_path}{path where to download the data including file name}
+\item{local_file_path}{path to local directory for download}
+
+\item{filename}{name of the file when downloaded (.fcs), may match the original or be newly defined in download}
 
 \item{access_key}{an object containing server URL and authentication info: see "authenticate"}
 }
 \description{
 Download an FCS file
+}
+\examples{
+access_key <- authenticate("my_username", "my_password",
+                           baseURL =  "http://54.186.1.226/api/v1")
+experiments <- get_experiments(access_key)
+experimentID <- experiments[experiments$name == "experiment_name", '_id']
+FCS_file_list <- get_FCS_files(experimentID, access_key)
+FCS_fileID <- FCS_file_list$`_id`[1]
+download_fcs_file <- function(experimentID, FCS_fileID, local_file_path = "/Desktop/my_directory/", filename = "my_fcs_file.fcs", access_key)
+filename <- FCS_file_list[FCS_file_list$`_id`==FCS_fileID, "filename"]
+download_fcs_file <- function(experimentID, FCS_fileID, local_file_path = "/Desktop/my_directory/", filename = filename, access_key)
 }
 

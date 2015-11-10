@@ -12,7 +12,7 @@ get_populations(experimentID, acess_key)
 \item{access_key}{an object containing server URL and authentication info: see "authenticate"}
 }
 \description{
-Get all populations for an experiment
+Returns a data frame that contains population IDs, names, and which gates define it
 }
 \examples{
 access_key <- authenticate("my_username", "my_password",

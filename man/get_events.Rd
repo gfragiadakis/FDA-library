@@ -2,7 +2,7 @@
 % Please edit documentation in R/base-API-functions.R
 \name{get_events}
 \alias{get_events}
-\title{Retrieves events}
+\title{Retrieve events from a specified population}
 \usage{
 get_events(experimentID, FCS_fileID, access_key, populationID = NULL)
 }
@@ -16,6 +16,6 @@ get_events(experimentID, FCS_fileID, access_key, populationID = NULL)
 \item{populationID}{the population ID as a string}
 }
 \description{
-Retrieves events
+Returns a data frame containing the cell events from a given experiment from a specified population
 }
 
