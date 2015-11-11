@@ -54,6 +54,33 @@ convert_names <- function(x){
   new_names <- make.names(x)
 }
 
+#' Make a bulk statistics request
+#'
+#' Makes a bulk statistics request for a set of FCS files, populations, channels, and statistics types
+#' Note limitations may exist on the number of queries in a bulk request (queries = # files x # populations x # channels)
+#' @param experimentID the experiment ID as a string
+#' @param FCS_fileIDs vector of FCS file IDs as strings
+#' @param access_key An object containing server URL and authentication info: see "authenticate"
+#' @param channel_names A vector of channel names as strings (note: not reagent names; for conversion of reagents to channels, see function ***)
+#' @param statistic_types A vector of statistic types returned including "mean", "median", "quantile", "eventcount"
+#' @param q specified quantile (numeric)
+#' @param populationIDs vector of population IDs as strings
+
+get_bulk_statistics <- function(experimentID, FCS_fileIDs, access_key, channel_names, statistic_types, q=NULL, populationIDs = NULL) {
+  opts <- access_key$opts
+  baseURL <- access_key$baseURL
+
+  url <- paste(
+    paste(baseURL, "experiments", experimentID, "bulkstatistics", sep="/"),
+    paste(
+      paste("fcsFileIds", toJSON(FCS_fileIDs), sep="="),
+      paste("channels", toJSON(channel_names), sep="="),
+      paste("statistics", toJSON(statistic_types), sep="="),
+      paste("q", k, sep="="),
+      paste("populationIds", toJSON(populationIDs), sep="="), sep="&"), sep="?")
+  return(fromJSON(getURL(url, .opts = opts)))
+}
+
 #' Get set of statistics for chosen features
 #'
 #' Specify populations and reagents to generate a feature set of each pair and retrieve statistics
