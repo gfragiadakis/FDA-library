@@ -211,7 +211,7 @@ get_plot <- function(experimentID, FCS_fileID, access_key, x_channel_name, y_cha
 #' @param access_key An object containing server URL and authentication info: see "authenticate"
 #' @param channel_name Channel name
 #' @param statistic_type Statistic desired, "mean", "median", "quantile", "eventcount
-#' @param k required for statistic "quantile", number from 0.0 to 1.0
+#' @param q required for statistic "quantile", number from 0.0 to 1.0
 #' @param populationID Population ID of population of interest
 #' @examples
 #' access_key <- authenticate("my_username", "my_password",
@@ -223,7 +223,7 @@ get_plot <- function(experimentID, FCS_fileID, access_key, x_channel_name, y_cha
 #'                statistic_type = "median", k=NULL, populationID=NULL)
 #' @export
 
-get_statistic <- function(experimentID, FCS_fileID, access_key, channel_name, statistic_type, k=NULL, populationID=NULL) {
+get_statistic <- function(experimentID, FCS_fileID, access_key, channel_name, statistic_type, q=NULL, populationID=NULL) {
   opts <- access_key$opts
   baseURL <- access_key$baseURL
   url <- paste(
@@ -232,7 +232,7 @@ get_statistic <- function(experimentID, FCS_fileID, access_key, channel_name, st
       paste("fcsFileId", FCS_fileID, sep="="),
       paste("channel", channel_name, sep="="),
       paste("statistic", statistic_type, sep="="),
-      paste("k", k, sep="="),
+      paste("q", q, sep="="),
       paste("populationId", populationID, sep="="), sep="&"), sep="?")
   return(fromJSON(getURL(url, .opts = opts)))
 }

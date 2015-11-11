@@ -81,6 +81,41 @@ get_bulk_statistics <- function(experimentID, FCS_fileIDs, access_key, channel_n
   return(fromJSON(getURL(url, .opts = opts)))
 }
 
+#' Get set of statistics using bulk requests
+#'
+#' Can use either reagent names or channel names but must specify at least one of them
+#'
+
+get_statistics_set_bulk <- function(experimentID, FCS_fileIDs, access_key, channel_names = NULL, reagent_names = NULL,
+                                    statistic_types, q=NULL, population_names = NULL, query_limit = 2500){
+
+  # FCS_fileIDs: see what we should put in
+
+  # generate channel_names
+  if (reagent_names != NULL){
+    channel_names <- convert_reagents_to_channels(reagent_names)
+  } elseif (reagent_names == NULL & channel_names == NULL){
+    print("Error: Must specify channel_names or reagent_names")
+  }
+
+  # generate population IDs
+  population_frame <- get_populations(experimentID, acess_key)
+  population_IDs <- population_frame[which(population_frame$name %in% population_names), "_id"]
+
+  query_size <- length(FCS_fileIDs)*length(populationIDs)*length(channel_names)
+  d <- 1:length(query_size)
+  ind_list <- split(d, ceiling(seq_along(d)/query_limit))
+
+  stat_frame = c()
+  for (i in 1:length(ind_list)){
+    stat_frame <- get_bulk_statistics(experimentID, FCS_fileIDs, access_key, channel_names, statistic_types, q=NULL, populationIDs = NULL)
+
+  }
+
+
+}
+
+
 #' Get set of statistics for chosen features
 #'
 #' Specify populations and reagents to generate a feature set of each pair and retrieve statistics
