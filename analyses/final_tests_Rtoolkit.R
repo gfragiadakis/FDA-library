@@ -31,7 +31,17 @@ annotated_FCS_list <- get_annotations(FCS_file_list)
 
 display_parameters(FCS_file_list, experimentID, access_key)
 
+# bulk statistics
+GET /experiments/:experimentId/statistics
+GET /experiments/:experimentID/bulkstatistics?fcsFileIds=["<fcsFileId1>","<fcsFileId2>"]&channels=["FSC-W","PE-A"]&statistics=["mean","median","quantile"]&populationIds=["<populationId1>","<populationId2>"]&k=0.95
+
+
 # Once have bulk statistics,
 # test folds
 # test thresholds
+
+channel_names <- c("Dy161Di","Dy162Di","Dy163Di")
+population_names <- c("pDCs","CD14+ Monocytes")
+test <- get_statistics_set_bulk(experimentID, FCS_files, access_key, channel_names = channel_names,
+  statistic_types = c("median"), q=NULL, population_names = population_names, query_limit = 900)
 
