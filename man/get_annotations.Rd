@@ -7,7 +7,7 @@
 get_annotations(FCS_files)
 }
 \arguments{
-\item{FCS_files}{Object containing FCS files}
+\item{FCS_files}{object containing FCS files from get_FCS_files()}
 }
 \description{
 If some files are not annotated, it will return a warning and only return the fcs files and annotations only

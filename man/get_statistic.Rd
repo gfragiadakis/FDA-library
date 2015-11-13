@@ -5,7 +5,7 @@
 \title{Retrieve statistic from a population}
 \usage{
 get_statistic(experimentID, FCS_fileID, access_key, channel_name,
-  statistic_type, k = NULL, populationID = NULL)
+  statistic_type, q = NULL, populationID = NULL)
 }
 \arguments{
 \item{experimentID}{the experiment ID as a string}
@@ -18,7 +18,7 @@ get_statistic(experimentID, FCS_fileID, access_key, channel_name,
 
 \item{statistic_type}{Statistic desired, "mean", "median", "quantile", "eventcount}
 
-\item{k}{required for statistic "quantile", number from 0.0 to 1.0}
+\item{q}{required for statistic "quantile", number from 0.0 to 1.0}
 
 \item{populationID}{Population ID of population of interest}
 }

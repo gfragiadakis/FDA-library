@@ -83,15 +83,26 @@ get_bulk_statistics <- function(experimentID, FCS_fileIDs, access_key, channel_n
 
 #' Get set of statistics using bulk requests
 #'
-#' Can use either reagent names or channel names but must specify at least one of them
-#'
+#' @param experimentID the experiment ID as a string
+#' @param FCS_files FCS files to take statistics from that contains IDs; can be either a data frame (e.g. output from get FCS files) or a vector of IDs as strings
+#' @param access_key An object containing server URL and authentication info: see "authenticate"
+#' @param channel_names A vector of channel names as strings (can specify either reagents or channels; leave the other as NULL)
+#' @param reagent_names A vector of reagent names as strings (can specify either reagents or channels; leave the other as NULL)
+#' @param statistic_types A vector of statistic types returned including "mean", "median", "quantile", "eventcount"
+#' @param q specified quantile (numeric)
+#' @param population_names vector of population names as strings
 
-get_statistics_set_bulk <- function(experimentID, FCS_fileIDs, access_key, channel_names = NULL, reagent_names = NULL,
+get_statistics_set_bulk <- function(experimentID, FCS_files, access_key, channel_names = NULL, reagent_names = NULL,
                                     statistic_types, q=NULL, population_names = NULL, query_limit = 2500){
 
-  # FCS_fileIDs: see what we should put in
-
+  # FCS_fileIDs
+  if (is.data.frame(FCS_files)){
+    FCS_fileIDs <- FCS_files$`_id`
+  } else {
+    FCS_fileIDs <- FCS_files
+  }
   # generate channel_names
+  # need to make conversion function
   if (reagent_names != NULL){
     channel_names <- convert_reagents_to_channels(reagent_names)
   } elseif (reagent_names == NULL & channel_names == NULL){
@@ -102,16 +113,34 @@ get_statistics_set_bulk <- function(experimentID, FCS_fileIDs, access_key, chann
   population_frame <- get_populations(experimentID, acess_key)
   population_IDs <- population_frame[which(population_frame$name %in% population_names), "_id"]
 
+  # here need to figure out how to subdivide
   query_size <- length(FCS_fileIDs)*length(populationIDs)*length(channel_names)
-  d <- 1:length(query_size)
-  ind_list <- split(d, ceiling(seq_along(d)/query_limit))
 
-  stat_frame = c()
-  for (i in 1:length(ind_list)){
-    stat_frame <- get_bulk_statistics(experimentID, FCS_fileIDs, access_key, channel_names, statistic_types, q=NULL, populationIDs = NULL)
+  if (query_size =< query_limit){
 
+    stat_frame <- get_bulk_statistics(experimentID, FCS_fileIDs, access_key, channel_names,
+                                      statistic_types, q=q, populationIDs = populationIDs)
+
+    } elseif (query_size > query_limit){
+
+    FCS_batch_size <- floor(query_limit/(length(populationIDs)*length(channel_names)))
+    d <- 1:length(length(FCS_fileIDs))
+    ind_list <- split(d, ceiling(seq_along(d)/FCS_batch_size))
+
+    stat_frame = c()
+    for (i in 1:length(ind_list)){
+      FCS_fileID_set <- FCS_fileIDs[ind_list[[i]]]
+      new_frame <- get_bulk_statistics(experimentID, FCS_fileID_set, access_key, channel_names,
+                                        statistic_types, q=NULL, populationIDs = populationIDs)
+      stat_frame <- rbind(stat_frame, new_frame)
+    }
   }
 
+
+
+
+# reformat everything post query for output; can keep in same format but should subsitute reagents, populations, and filenames
+# fuse into features?? (probably somewhere else...)
 
 }
 

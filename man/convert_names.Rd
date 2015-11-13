@@ -10,6 +10,6 @@ convert_names(x)
 \item{x}{A vector of names}
 }
 \description{
-Convert names for compatibility in R
+Convert names for compatibility in R, removing promblematic characters such as "+" of spaces
 }
 
