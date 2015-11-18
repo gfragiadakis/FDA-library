@@ -10,8 +10,8 @@
 
 get_annotations <- function(FCS_files){
 
-  if (sum(sapply(FCS_file_list$annotations, nrow) == 0) != 0){
-    FCS_files <- FCS_files[sapply(FCS_file_list$annotations, nrow) != 0, ]
+  if (sum(sapply(FCS_files$annotations, nrow) == 0) != 0){
+    FCS_files <- FCS_files[sapply(FCS_files$annotations, nrow) != 0, ]
     print("Warning: missing annotations in experiment, returning truncated file frame")
   } else {}
 
@@ -104,6 +104,7 @@ get_bulk_statistics <- function(experimentID, FCS_fileIDs, access_key, channel_n
       paste("statistics", toJSON(statistic_types), sep="="),
       paste("q", q, sep="="),
       paste("populationIds", toJSON(populationIDs), sep="="), sep="&"), sep="?")
+
   return(fromJSON(getURL(url, .opts = opts)))
 }
 
@@ -162,7 +163,7 @@ get_statistics_set_bulk <- function(experimentID, FCS_files, access_key, channel
     stat_frame = c()
     for (i in 1:length(ind_list)){
       FCS_fileID_set <- FCS_fileIDs[ind_list[[i]]]
-      print(ind_list[[i]])
+      print(i)
       new_frame <- get_bulk_statistics(experimentID, FCS_fileID_set, access_key, channel_names,
                                         statistic_types, q=NULL, populationIDs = populationIDs)
       stat_frame <- rbind(stat_frame, new_frame)

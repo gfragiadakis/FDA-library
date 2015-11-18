@@ -4,12 +4,13 @@
 #' @param df numeric data frame with rows as observations e.g. individuals and columns are features to correlate
 #' @param cor_threshold the threshold for a displayed correlation in the adjacency matrix
 #' @param output_directory the path to save the generated plots
+#' @param background background color of correlation map: either "black" or "white"
 #' @import ggplot2
 #' @import reshape2
 #' @import dplyr
 #' @export
 
-plot_correlations <- function(df, cor_threshold, output_directory){
+plot_correlations <- function(df, cor_threshold, output_directory, background = "white"){
 
   # generate correlation matrix
   correlations <- cor(df)
@@ -36,7 +37,7 @@ plot_correlations <- function(df, cor_threshold, output_directory){
   cormat_melted <- reshape2::melt(cormat_reordered)
 
   cor_plot <- qplot(x=Var1, y=Var2, data=cormat_melted, fill=value, geom="tile") +
-    scale_fill_gradient2(low = "red", high = "blue", mid = "white", midpoint = 0, limits=c(-1, 1)) + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+    scale_fill_gradient2(low = "red", high = "blue", mid = background, midpoint = 0, limits=c(-1, 1)) + theme(axis.text.x = element_text(angle = 90, hjust = 1))
   ggsave(paste(output_directory, "correlation_map.pdf", sep = ""), plot = cor_plot, width = 40, height = 40)
 
   adj_melted <- reshape2::melt(adj)
