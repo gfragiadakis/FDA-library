@@ -148,17 +148,20 @@ get_statistics_set_bulk <- function(experimentID, FCS_files, access_key, channel
 
   # subdivide into queries of appropriate length
   query_size <- length(FCS_fileIDs)*length(populationIDs)*length(channel_names)
+  print(query_size)
 
-  if (query_size <= query_limit){
-
+  if (query_size < query_limit){
+    print("Query is small enough")
     stat_frame <- get_bulk_statistics(experimentID, FCS_fileIDs, access_key, channel_names,
                                       statistic_types, q=q, populationIDs = populationIDs)
 
-    } else if (query_size > query_limit){
-
+    } else {
+    print("Query is big!!")
     FCS_batch_size <- floor(query_limit/(length(populationIDs)*length(channel_names)))
+    print(FCS_batch_size)
     d <- 1:length(FCS_fileIDs)
     ind_list <- split(d, ceiling(seq_along(d)/FCS_batch_size))
+    print(length(ind_list))
 
     stat_frame = c()
     for (i in 1:length(ind_list)){
@@ -168,9 +171,10 @@ get_statistics_set_bulk <- function(experimentID, FCS_files, access_key, channel
                                         statistic_types, q=NULL, populationIDs = populationIDs)
       stat_frame <- rbind(stat_frame, new_frame)
     }
+
   }
 
-return(stat_frame)
+  return(stat_frame)
 
 
 # reformat everything post query for output; can keep in same format but should subsitute reagents, populations, and filenames
