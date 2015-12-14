@@ -10,7 +10,7 @@
 #' @import dplyr
 #' @export
 
-plot_correlations <- function(df, cor_threshold, output_directory, background = "white"){
+plot_correlations <- function(df, cor_threshold, output_directory, background = "white", main_title = "basic"){
 
   # generate correlation matrix
   correlations <- cor(df)
@@ -36,13 +36,13 @@ plot_correlations <- function(df, cor_threshold, output_directory, background = 
 
   cormat_melted <- reshape2::melt(cormat_reordered)
 
-  cor_plot <- qplot(x=Var1, y=Var2, data=cormat_melted, fill=value, geom="tile") +
+  cor_plot <- ggplot(data = cormat_melted, aes(Var1, Var2, fill = value)) + geom_tile(colour = background) +
     scale_fill_gradient2(low = "red", high = "blue", mid = background, midpoint = 0, limits=c(-1, 1)) + theme(axis.text.x = element_text(angle = 90, hjust = 1))
-  ggsave(paste(output_directory, "correlation_map.pdf", sep = ""), plot = cor_plot, width = 40, height = 40)
+  ggsave(paste(output_directory, main_title, "_correlation_map.pdf", sep = ""), plot = cor_plot, width = 40, height = 40)
 
   adj_melted <- reshape2::melt(adj)
 
-  adj_plot <- qplot(x=Var1, y=Var2, data = adj_melted, fill=value, geom="tile") +
+  adj_plot <- ggplot(data = adj_melted, aes(Var1, Var2, fill = value)) + geom_tile() +
     scale_fill_gradient2(low = "red", high = "blue", mid = "white", midpoint = 0, limits=c(-1, 1)) + theme(axis.text.x = element_text(angle = 90, hjust = 1))
-  ggsave(paste(output_directory, cor_threshold,"_adjacency_map.pdf", sep = ""), plot = adj_plot, width = 40, height = 40)
+  ggsave(paste(output_directory, cor_threshold, main_title, "_adjacency_map.pdf", sep = ""), plot = adj_plot, width = 40, height = 40)
 }
