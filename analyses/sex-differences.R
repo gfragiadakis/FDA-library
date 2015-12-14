@@ -1,3 +1,7 @@
+library(FDAlibrary)
+library(dplyr)
+library(ggplot2)
+
 plotDirectory <- "~/Documents/FDAlibrary/analyses/plots/thresholded_asinh_0.2/sex_differences/"
 
 ###----------Comparing means and standard deviations of men v. women features--------------###
