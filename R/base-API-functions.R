@@ -7,7 +7,7 @@
 #' @param baseURL URL for the server
 #' @examples
 #' authenticate("my_username", "my_password",
-#'              baseURL =  "http://54.186.1.226/api/v1")
+#'              baseURL =  "https://www.immuneatlas.org/api/v1")
 #' @import jsonlite
 #' @import RCurl
 #' @export
