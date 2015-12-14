@@ -19,6 +19,6 @@ It returns an object containing the server URL and your connection information
 }
 \examples{
 authenticate("my_username", "my_password",
-             baseURL =  "http://54.186.1.226/api/v1")
+             baseURL =  "https://www.immuneatlas.org/api/v1")
 }
 
