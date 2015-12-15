@@ -76,7 +76,7 @@ f_df <- compiled_df %>%
   reshape2::dcast(., Donor ~ Condition_Feature) %>%
   dplyr::select(-Donor)
 
-plot_correlations(f_df, cor_threshold = 0.5, output_directory = plotDirectory, background = "white", main_title = "Female Structure")
+plot_correlations(f_df, cor_threshold = 0.5, output_directory = plotDirectory, background = "black", main_title = "Female Structure")
 
 # Male as female ordering
 f_cormat <- cor(f_df)
@@ -88,9 +88,9 @@ m_cormat <- m_cormat[hc$order, hc$order]
 
 cormat_melted <- reshape2::melt(m_cormat)
 
-cor_plot <- ggplot(data = cormat_melted, aes(Var1, Var2, fill = value)) + geom_tile(colour = "white") +
-  scale_fill_gradient2(low = "red", high = "blue", mid = "white", midpoint = 0, limits=c(-1, 1)) + theme(axis.text.x = element_text(angle = 90, hjust = 1))
-ggsave(paste(plotDirectory, "Male_correlation_map.pdf", sep = ""), plot = cor_plot, width = 40, height = 40)
+cor_plot <- ggplot(data = cormat_melted, aes(Var1, Var2, fill = value)) + geom_tile(colour = "black") +
+  scale_fill_gradient2(low = "red", high = "blue", mid = "black", midpoint = 0, limits=c(-1, 1)) + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+ggsave(paste(plotDirectory, "Male_correlation_map.pdf", sep = ""), plot = cor_plot,width = 40, height = 40)
 
 # difference between correlations
 f_cormat <- cor(f_df)

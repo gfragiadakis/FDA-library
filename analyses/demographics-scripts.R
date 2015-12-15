@@ -101,8 +101,8 @@ pca <- ggplot(PC_df, aes(PC1, PC2))
 pca + geom_point(size = 3, aes(colour = Age_Bins)) + scale_color_manual(values=c("orange", "red", "blue")) + ggtitle("PCA by Age (Bins)")
 pca + geom_point(aes(colour = Age))
 pca + geom_point(size = 3, aes(colour = Gender)) + scale_color_manual(values=c("firebrick", "blue", "gray")) + ggtitle("PCA by Gender")
-pca + geom_point(aes(colour = Ethnicity_group))
-
+pca + geom_point(aes(colour = Ethnicity_group)) + theme(panel.background = element_rect(fill = "black"), panel.grid.major = element_blank(),
+                                                        panel.grid.minor = element_blank())
 # histogram of ethnicities
 ggplot(PC_df, aes(Ethnicity_group)) + geom_bar()
 
