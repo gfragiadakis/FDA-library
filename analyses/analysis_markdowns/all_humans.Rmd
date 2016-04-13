@@ -1,0 +1,49 @@
+---
+title: "Analysis all humans"
+author: "GK Fragiadakis"
+date: "March 28, 2016"
+output: html_document
+---
+```{r}
+library(dplyr)
+library(reshape2)
+library(ggplot2)
+library(FDAlibrary)
+```
+
+Here's the analysis all together:
+
+```{r}
+compiled_df <- read.csv("~/Documents/FDAlibrary/saved_data_structures/human_signaling_fold_asinh_0.2.csv", row.names = 1)
+
+all_df <- compiled_df %>%
+  dplyr::select(Donor, Condition_Feature, value) %>%
+  reshape2::dcast(., Donor ~ Condition_Feature) %>%
+  dplyr::select(-Donor)
+
+all_cormat <- cor(all_df)
+dd <- as.dist((1-all_cormat)/2)
+hc <- hclust(dd)
+
+all_cormat <- all_cormat[hc$order, hc$order]
+
+cormat_melted <- reshape2::melt(all_cormat)
+
+cor_plot <- ggplot(data = cormat_melted, aes(Var1, Var2, fill = value)) + geom_tile(colour = "white")+
+  scale_fill_gradient2(low = "red", high = "blue", mid = "white", midpoint = 0, limits=c(-1, 1)) + theme(axis.text = element_blank()) + coord_fixed(ratio = 1) + ggtitle("Human immune correlations")
+
+print(cor_plot)
+```
+
+Adjacencies:
+```{r}
+adj <- make_adjacency(all_cormat, cor_threshold = 0.5)
+
+adj_melted <- reshape2::melt(adj)
+
+  adj_plot <- ggplot(data = adj_melted, aes(Var1, Var2, fill = value)) + geom_tile() +
+    scale_fill_gradient2(low = "red", high = "blue", mid = "white", midpoint = 0, limits=c(-1, 1)) + theme(axis.text = element_blank()) + coord_fixed(ratio = 1) + ggtitle("Human immune adjacency matrix")
+
+print(adj_plot)
+```
+

@@ -1,0 +1,113 @@
+---
+title: "Demographics"
+author: "GK Fragiadakis"
+date: "March 28, 2016"
+output: html_document
+---
+
+Using demographics data with predictions etc.  Starting with Age: 
+
+```{r}
+library(dplyr)
+library(reshape2)
+library(glmnet)
+library(ggplot2)
+library(FDAlibrary)
+library(blackbuck)
+library(SGL)
+
+dataDirectory <- "~/Documents/FDAlibrary/saved_data_structures/"
+demographics <- read.csv(paste(dataDirectory, "demographics.csv", sep = ""))
+compiled_df <- read.csv(paste(dataDirectory, "human_signaling_fold_asinh_0.2.csv", sep = ""), row.names = 1)
+
+demographics <- demographics[(demographics$Donor %in% compiled_df$Donor),]
+
+df <- dplyr::select(compiled_df, Donor, Gender, Condition_Feature, value)
+wide_df <- dcast(df, Donor + Gender ~ Condition_Feature)
+```
+
+Age analysis: 
+
+```{r}
+dems <- dplyr::select(demographics, Donor, Age)
+data <- merge(wide_df, dems)
+
+# Setting up training and test sets
+set.seed(1)
+train <- sample(1:86, 50, replace = FALSE)
+x <- dplyr::select(data, -Age, -Donor, -Gender)
+x <- as.matrix(x)
+y <- data$Age
+
+# training lasso model
+grid <- 10^seq(10,-2, length =100)
+lasso.mod <- glmnet(x[train,], y[train], alpha=1, lambda =grid)
+
+# use cross validation to choose lambda
+cv.out <- cv.glmnet(x[train,], y[train], alpha = 1)
+plot(cv.out)
+lam <- cv.out$lambda.1se
+
+# prediction
+lasso.pred <- predict(lasso.mod, s = lam, newx = x[-train,])
+lasso.pred.train <- predict(lasso.mod, s = lam, newx = x[train,])
+
+# training error
+plot(lasso.pred.train, y[train])
+lasso.cor.train <- cor.test(lasso.pred.train[, 1], y[train])
+print(lasso.cor.train)
+
+lasso.df.train <- data.frame(predicted_training = lasso.pred.train[, 1], actual = y[train])
+p <- ggplot(lasso.df.train, aes(predicted_training, actual))
+p + geom_point() + geom_abline(intercept = 0, slope = 1) + ggtitle("Age prediction (training set)") + coord_fixed(ratio = 1, xlim = c(20,65), ylim = c(15, 65))
+
+
+# plotting
+lasso.cor <- cor.test(lasso.pred[, 1], y[-train])
+print(lasso.cor)
+lasso.df <- data.frame(predicted = lasso.pred[, 1], actual = y[-train])
+p <- ggplot(lasso.df, aes(predicted, actual))
+p + geom_point() + geom_abline(intercept = 0, slope = 1) + ggtitle("Age prediction based on immune features (Lasso)") + coord_fixed(ratio = 1, xlim = c(20,65), ylim = c(15, 65))
+
+# extract coefficients
+lasso.coefs <- predict(lasso.mod, type = "coefficients", s = lam)
+lasso.coefs <- matrix(lasso.coefs, dimnames = list(rownames(lasso.coefs), "coef"))
+lasso.coefs[lasso.coefs != 0,]
+
+```
+
+Now we incorporate the module information:
+
+```{r}
+df_moduled <- read.csv("~/Documents/FDAlibrary/shiny-modules/output/df_moduled.csv", row.names = 1)
+df <- df_moduled %>%
+  dplyr::select(Condition_Feature, Module) %>%
+  unique()
+data_names <- convert_names(colnames(x))
+module_names <- as.character(df$Condition_Feature)
+identical(data_names, module_names)
+
+index <- df$Module
+
+index <- df$Module
+cv.out.SGL <- cvSGL(data = list(x = x[train, ], y = y[train]), index = index, type = "linear")
+plot(cv.out.SGL)
+which.min(cv.out.SGL$lldiff)
+SGLfit <- SGL(data = list(x = x[train, ], y = y[train]), index = index, type = "linear")
+predictions.train <- predictSGL(SGLfit, newX = x[train, ])
+
+predictions <- predictSGL(SGLfit, newX = x[-train, ])
+cor(y[-train][-34], predictions[-34, 14])
+# get 64% accuracy with grouping info!
+SGL.df <- data.frame(predicted = predictions[,14], actual = y[-train])
+p <- ggplot(SGL.df, aes(predicted, actual))
+p + geom_point() + geom_abline(intercept = 0, slope = 1) + ggtitle("Age prediction based on immune features with Sparse Group Lasso") + coord_fixed(ratio = 1, xlim = c(20,65), ylim = c(15, 65))
+```
+
+Model used the following: 
+```{r}
+SGL_coeffs <- data.frame(df, SGL_coefficients = SGLfit$beta[,14])
+dplyr::filter(SGL_coeffs, SGL_coefficients != 0)
+# down to 6 modules, 19 coefficients
+# stat signaling (could site Mark's stuff) and inflammatory signaling (CREB, P38, ERK)
+```
