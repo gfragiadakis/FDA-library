@@ -22,7 +22,12 @@ df_gender <- data.frame(df_gender, Condition = sapply(ids, "[[", 1),
                         Protein = sapply(ids, "[[", 3))
 
 p <- ggplot(df_gender, aes(m_mean, f_mean))
-p + geom_point() + geom_text(x = 0.25, y = 2, label = paste("R = ", round(cor(df_gender$m_mean, df_gender$f_mean),digits = 3), sep = "")) + geom_smooth(method = "lm", se=FALSE, color="black", formula = y ~ x)
+# p <- ggplot(df_gender, aes(log(m_mean), log(f_mean)))
+
+p + geom_point() +
+  geom_text(x = 0.25, y = 2, label = paste("R = ", round(cor(df_gender$m_mean, df_gender$f_mean),digits = 3), sep = "")) +
+  geom_smooth(method = "lm", se=FALSE, color="black", formula = y ~ x) +
+  coord_fixed(ratio = 1)
 ggsave(paste(plotDirectory, "men_v_women_mean.pdf", sep = ""))
 
 p <- ggplot(df_gender, aes(m_sd, f_sd))
@@ -55,12 +60,24 @@ write.csv(lo_genes, file = paste(plotDirectory, "SAM_features_men.csv", sep = ""
 
 df <- dplyr::filter(df, Gender != "x")
 df_up <- df[df[, "Condition_Feature"] %in% up_genes,]
-ggplot(df_up, aes(Condition_Feature, value)) + geom_boxplot(aes(colour = Gender)) + scale_color_manual(values=c("firebrick1", "royalblue"))
-ggsave(filename = paste(plotDirectory,"gender_sig_up.pdf", sep = ""), width = 30, height = 10)
+ggplot(df_up, aes(Condition_Feature, value)) + geom_boxplot(aes(colour = Gender)) + scale_color_manual(values=c("firebrick1", "dark blue")) + coord_flip()
+ggsave(filename = paste(plotDirectory,"gender_sig_up.pdf", sep = ""))
 
 df_lo <- df[df[, "Condition_Feature"] %in% lo_genes,]
-ggplot(df_lo, aes(Condition_Feature, value)) + geom_boxplot(aes(colour = Gender)) + scale_color_manual(values=c("firebrick1", "royalblue"))
-ggsave(filename = paste(plotDirectory,"gender_sig_lo.pdf", sep = ""), width = 30, height = 10)
+ggplot(df_lo, aes(Condition_Feature, value)) + geom_boxplot(aes(colour = Gender)) + scale_color_manual(values=c("firebrick1", "dark blue")) + coord_flip()
+ggsave(filename = paste(plotDirectory,"gender_sig_lo.pdf", sep = ""))
+
+#------- show sig on original plot
+significance <- rep("Not significant", dim(df_gender)[1])
+significance[df_gender$Condition_Feature %in% lo_genes] <- "Higher in Males"
+significance[df_gender$Condition_Feature %in% up_genes] <- "Higher in Females"
+
+df_gender_sig <- data.frame(df_gender, Significance = significance)
+p <- ggplot(df_gender_sig, aes(m_mean, f_mean))
+
+p + geom_point(aes(colour = Significance)) + scale_colour_manual(values = c("Red", "Blue", "Black")) +
+  geom_smooth(method = "lm", se=FALSE, color="black", formula = y ~ x) +
+  coord_fixed(ratio = 1)
 
 #####--------------Correlation differences----------------------- #####
 

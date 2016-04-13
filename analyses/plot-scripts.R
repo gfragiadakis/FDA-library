@@ -5,6 +5,7 @@ library(ggplot2)
 ###---------Pre-threshold feature plots---------########
 
 plotDirectory <- "~/Documents/FDAlibrary/analyses/plots/"
+asinh_df <- read.csv("~/Documents/FDAlibrary/saved_data_structures/human_signaling_fold_asinh.csv", row.names = 1)
 
 for (i in levels(asinh_df$Condition)){
   if (i != "Basal"){
@@ -18,6 +19,15 @@ for (i in levels(asinh_df$Condition)){
   }
 
 }
+
+# all features in a single plot
+df <- reshape2::melt(asinh_df, variable.name = "Feature", value.name = "Asinh_ratio")
+df <- dplyr::mutate(df, Condition_Feature = paste(Condition, Feature, sep = "_"))
+p <- ggplot(df, aes(Condition_Feature, Asinh_ratio))
+p + geom_boxplot() + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+p + geom_boxplot() + theme(axis.text.x=element_blank())
+ggsave(paste(plotDirectory,"ALL_feature_boxplots.pdf", sep = ""), width = 40, height = 10)
+
 
 ###--------Thresholded at 0.2--------#######
 

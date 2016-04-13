@@ -35,18 +35,76 @@ lam <- cv.out$lambda.1se
 
 # prediction
 lasso.pred <- predict(lasso.mod, s = lam, newx = x[-train,])
+lasso.pred.train <- predict(lasso.mod, s = lam, newx = x[train,])
+
+# training error
+plot(lasso.pred.train, y[train])
+lasso.cor.train <- cor.test(lasso.pred.train[, 1], y[train])
+# training R value is 0.831
+lasso.df.train <- data.frame(predicted_training = lasso.pred.train[, 1], actual = y[train])
+p <- ggplot(lasso.df.train, aes(predicted_training, actual))
+p + geom_point() + geom_abline(intercept = 0, slope = 1) + ggtitle("Age prediction (training set)") + coord_fixed(ratio = 1, xlim = c(20,65), ylim = c(15, 65))
+
 
 # plotting
 plot(lasso.pred, y[-train])
 lasso.cor <- cor.test(lasso.pred[, 1], y[-train])
+# test R value is 0.64
 lasso.df <- data.frame(predicted = lasso.pred[, 1], actual = y[-train])
 p <- ggplot(lasso.df, aes(predicted, actual))
-p + geom_point() + geom_abline(intercept = 0, slope = 1) + ggtitle("Age prediction based on immune features")
+p + geom_point() + geom_abline(intercept = 0, slope = 1) + ggtitle("Age prediction based on immune features") + coord_fixed(ratio = 1, xlim = c(20,65), ylim = c(15, 65))
 
 # extract coefficients
 lasso.coefs <- predict(lasso.mod, type = "coefficients", s = lam)
 lasso.coefs <- matrix(lasso.coefs, dimnames = list(rownames(lasso.coefs), "coef"))
 lasso.coefs[lasso.coefs != 0,]
+
+# training ridge model
+grid <- 10^seq(10,-2, length =100)
+ridge.mod <- glmnet(x[train,], y[train], alpha=0, lambda =grid)
+
+# use cross validation to choose lambda
+cv.ridge <- cv.glmnet(x[train,], y[train], alpha = 0, lambda = grid)
+plot(cv.ridge)
+lam <- cv.ridge$lambda.1se
+
+# prediction
+ridge.pred <- predict(ridge.mod, s = lam, newx = x[-train,])
+ridge.pred.train <- predict(ridge.mod, s = lam, newx = x[train,])
+
+# plotting
+plot(ridge.pred, y[-train])
+ridge.cor <- cor.test(lasso.pred[, 1], y[-train])
+#
+ridge.df <- data.frame(predicted = ridge.pred[, 1], actual = y[-train])
+p <- ggplot(ridge.df, aes(predicted, actual))
+p + geom_point() + geom_abline(intercept = 0, slope = 1) + ggtitle("Age prediction based on immune features") + coord_fixed(ratio = 1, xlim = c(20,65), ylim = c(15, 65))
+
+#----age with grouping info:
+
+df <- df_moduled %>%
+  dplyr::select(Condition_Feature, Module) %>%
+  unique()
+data_names <- convert_names(colnames(x))
+module_names <- as.character(df$Condition_Feature)
+identical(data_names, module_names)
+
+index <- df$Module
+
+index <- df$Module
+cv.out.SGL <- cvSGL(data = list(x = x[train, ], y = y[train]), index = index, type = "linear")
+plot(cv.out.SGL)
+which.min(cv.out.SGL$lldiff)
+SGLfit <- SGL(data = list(x = x[train, ], y = y[train]), index = index, type = "linear")
+predictions.train <- predictSGL(SGLfit, newX = x[train, ])
+
+predictions <- predictSGL(SGLfit, newX = x[-train, ])
+cor(y[-train][-34], predictions[-34, 14])
+# get 64% accuracy with grouping info!
+
+SGL_coeffs <- data.frame(df, SGL_coefficients = SGLfit$beta[,14])
+# down to 6 modules, 19 coefficients
+# stat signaling (could site Mark's stuff) and inflammatory signaling (CREB, P38, ERK)
 
 
 #----Age binning----#
@@ -95,14 +153,17 @@ PC_df <- data.frame(transformed_x, Age_Bins = bins_3, Age = dems$Age, Gender = d
 # loadings
 loadings1 <- pr.out$rotation[, "PC1"]
 loadings2 <- pr.out$rotation[, "PC2"]
+loadings3 <- pr.out$rotation[, "PC3"]
+
 
 # plotting
 pca <- ggplot(PC_df, aes(PC1, PC2))
 pca + geom_point(size = 3, aes(colour = Age_Bins)) + scale_color_manual(values=c("orange", "red", "blue")) + ggtitle("PCA by Age (Bins)")
-pca + geom_point(aes(colour = Age))
-pca + geom_point(size = 3, aes(colour = Gender)) + scale_color_manual(values=c("firebrick", "blue", "gray")) + ggtitle("PCA by Gender")
-pca + geom_point(aes(colour = Ethnicity_group)) + theme(panel.background = element_rect(fill = "black"), panel.grid.major = element_blank(),
-                                                        panel.grid.minor = element_blank())
+pca + geom_point(size = 2, aes(colour = Age)) + ggtitle("PCA by Age")
+pca + geom_point(size = 2, aes(colour = Gender)) + scale_color_manual(values=c("firebrick", "blue", "gray")) + ggtitle("PCA by Gender")
+pca + geom_point(size = 2, aes(colour = Ethnicity_group)) + ggtitle("PCA by Ethnicity")
+# + theme(panel.background = element_rect(fill = "black"), panel.grid.major = element_blank(),
+#                                                        panel.grid.minor = element_blank())
 # histogram of ethnicities
 ggplot(PC_df, aes(Ethnicity_group)) + geom_bar()
 

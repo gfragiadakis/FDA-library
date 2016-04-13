@@ -5,8 +5,8 @@ df <- compiled_df
 
 # correlate all the features and then look at the distribution of the correlations
 
-df <- dplyr::select(df, Donor, Feature_Condition, value)
-df <- reshape2::dcast(df, Donor ~ Feature_Condition)
+df <- dplyr::select(df, Donor, Condition_Feature, value)
+df <- reshape2::dcast(df, Donor ~ Condition_Feature)
 df <- data.frame(df[,-1], row.names = df$Donor)
 
 correlations <- cor(df)
